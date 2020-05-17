@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Carro Rick y Morty</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/csg.js"></script>
+    <script src="js/THREE.CSG.js"></script>
+    <script>
+        var scene, aspect, camera, renderer, controls;
+        var fan;
+        var strip;
+        var tapa;
+        	var startTime = Date.now();
+        
+        // VARIABLES DE UBICACION PARA USAR EN TECLAS
+		var tecla_W = false;
+		var tecla_S = false;
+		var tecla_A = false;
+		var tecla_D = false;
+        var tecla_R=false;
+		var scaleUp = false;
+		var scaleDown = false;
+		var xAxis = true;
+		var yAxis = false;
+		var zAxis = false;
+        var thetaSum=0;
+		var positivo=false;
+        var arriba=false;
+        var abajo=false;
+        
+		
+		
+        var thetaSum=0;
+
+         //ACCIONES REALIZADAS POR TECLADO
+			
+			var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87: 
+						tecla_W = true;
+						break;
+					case 83: 
+						tecla_S = true;
+						break;
+					
+		scaleUp = true;
+						break;
+					
+				
+					case 88: // SELECCIONAR EJE X DE ROTACION
+						yAxis = false;
+						zAxis = false;
+						xAxis = true;
+						break;
+				    case 100: // SELECCIONAR EJE Y DE ROTACION
+						xAxis = false;
+						zAxis = false;
+						yAxis = true;
+						break;
+					case 90: // SELECCIONAR EJE Z DE 
+						xAxis = false;
+						yAxis = false;
+						zAxis = true;
+						break;
+                    case 89: 
+						arriba = true;
+						break;    
+                    case 84:
+						abajo= true ;
+						break;
+                    case 82:
+                        tecla_R=true;
+                        break;
+                        	case 65: 
+						tecla_A = true;
+						break;
+					case 68: 
+						tecla_D = true;
+						break;
+            
+                   
+				}
+			};	  
+		  			
+			var onKeyUp = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87: 
+						tecla_W = false;
+						break;
+                    case 83: 
+						tecla_S = false;
+						break;
+					case 65: 
+						tecla_A = false;
+						break;
+					case 68: 
+						tecla_D = false;
+						break;
+					 case 89: 
+						arriba = false;
+						break;    
+                    case 84:
+						abajo=false;
+						break;
+                    case 82:
+                        tecla_R=false;
+                        break;
+                 
+				}
+			};	  	
+			
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
+
+        class TRIANGLE_FAN{
+            constructor( Geometria ){
+                this.geometria = Geometria;
+                console.log(this.geometria);
+            }
+            draw(){
+            for( var i=2; i<this.geometria.vertices.length; i++ ){
+                this.geometria.faces.push( new THREE.Face3(0,i-1,i) );
+            }
+            this.geometria.computeFaceNormals();
+            var materialFan = new THREE.MeshStandardMaterial( { color: 0xFFFFFF, metalness: 0.5, roughness: 0.1, transparent: true, opacity: 0.5 ,side:THREE.DoubleSide } );
+            var fan = new THREE.Mesh( this.geometria, materialFan );
+            scene.add( fan );
+            }
+        }
+
+        class TRIANGLE_STRIP{
+            constructor( Geometria ){
+                this.geometria = Geometria;
+                console.log(this.geometria);
+            }
+            draw(){
+                for( var i=2; i<this.geometria.vertices.length; i++ ){
+                this.geometria.faces.push( new THREE.Face3(i-2,i-1,i) );
+            }
+            this.geometria.computeFaceNormals();
+            var materialStrip = new THREE.MeshStandardMaterial( { color: 0xFFFFFF, metalness: 0.5, roughness: 0.1 , transparent: true, opacity: 0.5 ,side:THREE.DoubleSide } );
+            var strip = new THREE.Mesh( this.geometria, materialStrip );
+            scene.add( strip );
+            }
+        }
+
+        init();
+        animate();
+
+        function init() {
+            //INICIALIZACIÓN
+            scene = new THREE.Scene();
+            aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  /*          //ELEMENTOS COMUNES
+             var size = 10;
+            var arrowSize = 1;
+            var divisions = size;
+            var origin = new THREE.Vector3(0, 0, 0);
+            var x = new THREE.Vector3(1, 0, 0);
+            var y = new THREE.Vector3(0, 1, 0);
+            var z = new THREE.Vector3(0, 0, 1);
+            var color = new THREE.Color(0x333333);
+            var colorR = new THREE.Color(0xAA3333);
+            var colorG = new THREE.Color(0x33AA33);
+            var colorB = new THREE.Color(0x333366);
+
+           //CREAR LAS GRILLAS PARA EL ESCENARIO
+            var axesHelper = new THREE.AxesHelper(size);
+            scene.add(axesHelper);
+
+            var gridHelperXZ = new THREE.GridHelper(size, divisions, color, color);
+            scene.add(gridHelperXZ);
+
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis(y, THREE.Math.degToRad(90)); */
+
+
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight(0xffffff, 2);
+            scene.add(ambient);
+
+            var pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(-15, -12, 15);
+            scene.add(pointLight);
+
+            var pointLight = new THREE.PointLight(0xffffff, .5, 100);
+            pointLight.position.set(15, -12, -15);
+            scene.add(pointLight);
+            
+             //FONDO
+        
+        const loader = new THREE.TextureLoader();
+            loader.load('Fondo.jpg' , function(texture)
+            {
+             scene.background = texture;  
+            });  
+
+         
+    //CARGA DE TEXTURAS PARA LAS FIGURAS
+            
+    var textureLoader = new THREE.TextureLoader();
+    Llanta = textureLoader.load("1.jpeg");
+
+            var material1 = new THREE.MeshStandardMaterial({ color: 0x1E90FF, metalness: 0.5, roughness: 0.1 });
+            var material2 = new THREE.MeshStandardMaterial({ color:  0xe9ca86 , metalness: 0.5, roughness: 0.1 });
+            var material3 = new THREE.MeshStandardMaterial({ color:  0xffffff , metalness: 0.5, roughness: 0.1,  map: Llanta });
+            var material4 = new THREE.MeshStandardMaterial({ color:  0x4169E1 , metalness: 0.5, roughness: 0.1 });
+            var materialEstrella = new THREE.MeshStandardMaterial({ color: 0x9fd0e0, metalness: 0.5,  roughness: 0.1, side: THREE.DoubleSide });
+            var materialSilla = new THREE.MeshStandardMaterial({ color: 0x8a7268, metalness: 0.5, roughness: 0.1, side: THREE.DoubleSide });
+            
+   
+            //CREAR LAS GEOMETRÍAS
+            
+           
+            var geoCubo1 = new THREE.BoxGeometry(10, 10, 10);
+            var geoCubo2 = new THREE.BoxGeometry(8, 4, 8);
+            var geoCubo3 = new THREE.BoxGeometry(2, 0.5, 0.5);
+            var geoEsfera1 = new THREE.SphereGeometry(5, 32, 32);
+            var geoEsfera2 = new THREE.SphereGeometry(3, 32, 32);
+            var geoEsfera3 = new THREE.SphereGeometry(2.8, 32, 32);
+            var geoCilindro = new THREE.CylinderGeometry(0.4,0.1,1.5,10);
+            var toroide = new THREE.TorusGeometry( 2, 0.8, 11, 100 );
+            var geoAsiento = new THREE.BoxGeometry(2, 0.5, 2.5);
+            
+            var meshCubo1 = new THREE.Mesh(geoCubo1, material1);
+            var meshCubo2 = new THREE.Mesh(geoCubo2, material2);
+            var meshCubo3 = new THREE.Mesh(geoCubo3, material3);
+            var meshCubo4 = new THREE.Mesh(geoCubo3, material3);
+            var meshCubo5 = new THREE.Mesh(geoCubo3, material3);
+            var meshEsfera1 = new THREE.Mesh(geoEsfera1, material1);
+            var meshEsfera2 = new THREE.Mesh(geoEsfera2, material2);
+            var meshEsfera3 = new THREE.Mesh(geoEsfera3, material2);
+            var meshLuz = new THREE.Mesh( geoCilindro, material2 );
+            var meshLuz1 = new THREE.Mesh( geoCilindro, material2 );
+            var rueda = new THREE.Mesh( toroide, material3 );
+            var rueda2 = new THREE.Mesh( toroide, material3 );
+            var rueda3 = new THREE.Mesh( toroide, material3 );
+            var cube = new THREE.Mesh(geoAsiento, materialSilla);
+            cube2=cube.clone();
+
+            //mover geometrias
+            meshCubo1.translateY(-3.2);
+            meshCubo2.translateY(6.2);
+            meshEsfera2.translateY(3.7);
+            meshEsfera3.translateY(4);
+            
+            meshCubo3.position.y=2.5;
+            meshCubo3.position.z=4.3;
+            
+            meshCubo4.position.y=3.1;
+            meshCubo4.position.z=3.9;
+            
+            meshCubo5.position.y=3.7;
+            meshCubo5.position.z=3.5;
+           
+           
+            meshLuz.rotation.x=-1;
+            meshLuz.position.x=1;
+            meshLuz.position.y=3;
+            meshLuz.position.z=-3.3;
+            
+            meshLuz1.rotation.x=-1;
+            meshLuz1.position.x=-1;
+            meshLuz1.position.y=3;
+            meshLuz1.position.z=-3.3;
+            
+             rueda.applyMatrix( new THREE.Matrix4().makeScale(.4,.4,.6) );
+            rueda.rotation.y=1.57;
+			rueda.position.x=3;
+			rueda.position.y=1.6;
+			rueda.position.z=0;
+            
+            rueda2.applyMatrix( new THREE.Matrix4().makeScale(.4,.4,.6) );
+            rueda2.rotation.y=1.57;
+			rueda2.position.x=-3;
+			rueda2.position.y=1.6;
+			rueda2.position.z=0;
+            
+            rueda3.applyMatrix( new THREE.Matrix4().makeScale(.4,.4,.6) );
+            rueda3.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.8,3.3) );
+            rueda3.rotation.y=1.57;
+            rueda3.position.x=0;
+            rueda3.position.y=1.6;
+            rueda3.position.z=3.1;
+			
+            cube.position.y=2.3;
+            cube.position.z = -0.8;
+            cube2.applyMatrix(new THREE.Matrix4().makeRotationX((110*Math.PI)/180));
+            cube2.position.y = 3.5;
+            cube2.position.z = 1;
+
+            //Convertir a CSG
+
+            var cubo1CSG = THREE.CSG.fromMesh(meshCubo1);
+            var cubo2CSG = THREE.CSG.fromMesh(meshCubo2);
+            var cubo3CSG = THREE.CSG.fromMesh(meshCubo3);
+            var cubo4CSG = THREE.CSG.fromMesh(meshCubo4);
+            var cubo5CSG = THREE.CSG.fromMesh(meshCubo5);
+            var esfera1CSG = THREE.CSG.fromMesh(meshEsfera1);
+            var esfera2CSG = THREE.CSG.fromMesh(meshEsfera2);
+            var esfera3CSG = THREE.CSG.fromMesh(meshEsfera3);
+           
+            
+
+            //hacer Operaciones CSG
+
+            var result1 = esfera1CSG.subtract(cubo1CSG).union(esfera2CSG).subtract(cubo2CSG).subtract(esfera3CSG).subtract(cubo3CSG).subtract(cubo4CSG).subtract(cubo5CSG);
+
+            //compilar
+
+            var nave = THREE.CSG.toMesh(result1);
+            nave.material=material1;
+            
+            
+
+            
+          
+            
+            //scene.add(meshEsfera3);
+
+//CUPULA
+            var punto0 = new THREE.Vector3(0, 2, 0);
+            var geometria = new THREE.Geometry();
+            var geometria2 = new THREE.Geometry();
+            var radio = 2.8;
+            var res = 32.0;
+
+            for (var j = 0; j <= res; j++) {
+                for (var i = 0; i <= res; i++) {
+                    var punto = new THREE.Vector3();
+                    var punto2 = new THREE.Vector3();
+                    punto.x = radio * Math.cos((j * 2 * Math.PI) / res) * Math.sin((i * Math.PI) / res);
+                    punto.y = radio * Math.sin((j * 2 * Math.PI) / res) * Math.sin((i * Math.PI) / res)+3.5;
+                    punto.z = radio * Math.cos((i * Math.PI) / res);
+
+                    punto2.x = radio * Math.cos(((j + 1) * 2 * Math.PI) / res) * Math.sin(((i + 1) * Math.PI) / res);
+                    punto2.y = radio * Math.sin(((j + 1) * 2 * Math.PI) / res) * Math.sin(((i + 1) * Math.PI) / res)+3.5;
+                    punto2.z = radio * Math.cos(((i + 1) * Math.PI) / res);
+                    geometria2.vertices.push(punto);
+                    geometria2.vertices.push(punto2);
+                }
+            }
+
+            strip = new TRIANGLE_STRIP(geometria2);
+            strip.draw();
+            
+    //TURBINAS
+            var circleRadius = 1;
+            var circleShape = new THREE.Shape();
+                circleShape.moveTo(0, circleRadius)
+                circleShape.quadraticCurveTo(circleRadius, circleRadius, circleRadius, 0)
+                circleShape.quadraticCurveTo(circleRadius, - circleRadius, 0, - circleRadius)
+                circleShape.quadraticCurveTo(- circleRadius, - circleRadius, - circleRadius, 0)
+                circleShape.quadraticCurveTo(- circleRadius, circleRadius, 0, circleRadius);
+                
+            var r=1;
+            var circleShapeHole = new THREE.Path();
+            circleShapeHole.moveTo(0, circleRadius*r)
+            circleShapeHole.quadraticCurveTo(circleRadius*r, circleRadius*r, circleRadius*r, 0)
+            circleShapeHole.quadraticCurveTo(circleRadius*r, - circleRadius*r, 0, - circleRadius*r)
+            circleShapeHole.quadraticCurveTo(- circleRadius*r, - circleRadius*r, - circleRadius*r, 0)
+            circleShapeHole.quadraticCurveTo(- circleRadius*r, circleRadius*r, 0, circleRadius*r);
+
+            circleShape.holes.push(circleShapeHole);
+
+            var extrudeSettings = { depth:8,  bevelSegments: 2, bevelSize: 1.2, bevelThickness: 5 };
+
+            var geometry = new THREE.ExtrudeBufferGeometry(circleShape, extrudeSettings);
+            var turbinaDer = new THREE.Mesh(geometry, material4);
+            var turbinaIzq = new THREE.Mesh(geometry, material4);
+
+            turbinaDer.applyMatrix(new THREE.Matrix4().makeScale(0.4, 0.4, 0.03));
+            turbinaDer.position.x = 3.8;
+            turbinaDer.position.y = 4.2;
+            turbinaDer.position.z = -1.5;
+            
+
+            turbinaIzq.applyMatrix(new THREE.Matrix4().makeScale(0.4, 0.4, 0.03));
+            turbinaIzq.position.x = -3.8;
+            turbinaIzq.position.y = 4.2;
+            turbinaIzq.position.z = -1.5;
+            
+            
+             var randomPoints = [];
+
+            for (var i = 0; i < 10; i++) {
+                var numRng1 = Math.random() * (5 - (-5)) + (-5);
+                var numRng2 = Math.random() * ((-5) - 5 )+ 5;
+                randomPoints.push(new THREE.Vector3((i - 4.5) * 50, numRng1, numRng2));
+
+            }
+
+            var randomSpline = new THREE.CatmullRomCurve3(randomPoints);
+
+            //
+
+            var extrudeSettings = {
+                steps: 200,
+                bevelEnabled: false,
+                extrudePath: randomSpline
+            };
+
+            var pts = [], numPts = 5;
+
+            for (var i = 0; i < numPts * 2; i++) {
+
+                var l = i % 2 == 1 ? 10 : 20;
+
+                var a = i / numPts * Math.PI;
+
+                pts.push(new THREE.Vector2(Math.cos(a) * l, Math.sin(a) * l));
+
+            }
+
+            var shape = new THREE.Shape(pts);
+
+            var geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+
+            var estrella = new THREE.Mesh(geometry, materialEstrella);
+            var estrella2 = estrella.clone();
+
+            estrella.applyMatrix(new THREE.Matrix4().makeScale(0.005, 0.02, 0.02));
+            estrella.applyMatrix(new THREE.Matrix4().makeRotationY((90 * Math.PI) / 180));
+            estrella.applyMatrix(new THREE.Matrix4().makeTranslation(4.1, 4.5, 4));
+            estrella2.applyMatrix(new THREE.Matrix4().makeScale(0.005, 0.02, 0.02));
+            estrella2.applyMatrix(new THREE.Matrix4().makeRotationY((90 * Math.PI) / 180));
+            estrella2.applyMatrix(new THREE.Matrix4().makeTranslation(-4.1, 4.5, 4));
+
+            scene.add(estrella);
+            scene.add(estrella2);
+
+
+           
+ //AGREGAR A ESCENA 
+            
+            
+            nave.add(meshLuz);
+            nave.add(meshLuz1);
+            nave.add(rueda);
+            nave.add(rueda2);
+            nave.add(rueda3);
+            nave.add(turbinaDer);
+            nave.add(turbinaIzq);
+            nave.add(estrella);
+            nave.add(estrella2);
+            nave.add(cube);
+            nave.add(cube2);
+            scene.add(nave);
+ 
+            camera.position.x = 8;
+            camera.position.y = 2;
+            camera.position.z = -13;
+            camera.lookAt(origin);
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            render();
+        }
+        function render() {
+            renderer.render(scene, camera);
+            var dtime = Date.now()-startTime;
+		var tx=0, ty=0, tz=0;	//Variables para traslacion
+		var sc = 1;				//Variable para escala
+		var theta=0;			//Variable para ángulo de rotacion de piernas
+		var sigma=0;			//Variable para ángulo de rotación de caderas
+		var sigma2=0;
+        
+        
+		if(thetaSum>90*Math.PI/180) {positivo = false;}
+		if(thetaSum<=-150*Math.PI/180) {positivo = true;}
+        
+        if(thetaSum>-150*Math.PI/180) {posi_1 = false;}
+		if(thetaSum<=90*Math.PI/180) {posi_1 = true;}
+		
+        if(arriba){ if(positivo)	theta = .1;
+			    else theta = -.1;            }
+        if(abajo){ if(posi_1)	theta = -.1;
+			     else theta = .1;            }
+        
+        thetaSum+=theta;
+        
+        
+		if(tecla_W) { tx=0; ty=0; tz=.1;	}
+		if(tecla_S) {	tx=0; ty=0; tz=-.1; }
+		
+		if(tecla_D)	{sigma = -.1;}
+		if(tecla_A){sigma = .1;}
+      
+       
+        if(tecla_R) {sigma2=-.1;}
+		
+			
+		//MATRIZ DE TRASLACIÓN
+		var t = new THREE.Matrix4();
+		t.set( 	1, 0, 0, tx,
+				0, 1, 0, ty, 
+				0, 0, 1, tz,
+				0, 0, 0, 1	);
+		
+		nave.matrix.multiply(t); 	
+		//ROTACIONES
+		var ct1 = Math.cos(theta);
+		var ct2 = Math.cos(-theta);
+        
+		var cs = Math.cos(sigma);
+        var ss = Math.sin(sigma);
+      
+        
+		var st1 = Math.sin(theta);
+		var st2 = Math.sin(-theta);
+        
+        var cso = Math.cos(sigma2);
+        var sso = Math.sin(sigma2);
+        
+		
+		var r = new THREE.Matrix4();
+		var r1 = new THREE.Matrix4();
+		var r2 = new THREE.Matrix4();
+        var r3 = new THREE.Matrix4();
+        
+        
+        
+        
+
+		//MATRIZ DE ROTACIÓN EN EJE Y
+		r.set( 	   cs,  0, ss, 0,
+					0,  1,  0, 0, 
+				  -ss,  0, cs, 0,
+					0,  0,  0, 1 );	
+       
+		//MATRICES DE ROTACIÓN EN EJE LOCAL DE PIERNAS	
+		r1.set( 	1,  0,  0, 0,
+					0, ct1,-st1, 0, 
+					0, st1, ct1, 0,
+					0,  0,  0, 1 );	
+		r2.set( 	1,  0,  0, 0,
+					0, ct2,-st2, 0, 
+					0, st2, ct2, 0,
+					0,  0,  0, 1 );		
+       
+		 r3.set(     cso, 0, sso, 0,
+                    0, 1, 0, 0, 
+                    -sso, 0, cso, 0,
+                    0, 0, 0, 1 );
+		//ROTACION EN UN EJE PARALELO
+	    var tempMatrix = new THREE.Matrix4();
+		tempMatrix.copyPosition( nave.matrix );
+        
+        
+        nave.applyMatrix( new THREE.Matrix4().getInverse(tempMatrix) );
+		nave.applyMatrix(r);
+		nave.applyMatrix( tempMatrix );
+
+        }
+    </script>
+</body>
+
+</html>
