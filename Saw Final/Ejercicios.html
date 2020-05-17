@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ejercicio</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/csg.js"></script>
+    <script src="js/THREE.CSG.js"></script>
+    <script>
+        var scene, aspect, camera, renderer, controls;
+        var startTime = Date.now();
+        
+        // VARIABLES DE UBICACION PARA USAR EN TECLAS
+	
+		
+		
+
+         //ACCIONES REALIZADAS POR TECLADO
+			
+			
+     
+        init();
+        animate();
+
+        function init() {
+            //INICIALIZACIÓN
+            scene = new THREE.Scene();
+            aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            //ELEMENTOS COMUNES
+             var size = 70;
+            var arrowSize = 1;
+            var divisions = size;
+            var origin = new THREE.Vector3(0, 0, 0);
+            var x = new THREE.Vector3(1, 0, 0);
+            var y = new THREE.Vector3(0, 1, 0);
+            var z = new THREE.Vector3(0, 0, 1);
+            var color = new THREE.Color(0x333333);
+            var colorR = new THREE.Color(0xAA3333);
+            var colorG = new THREE.Color(0x33AA33);
+            var colorB = new THREE.Color(0x333366);
+
+           //CREAR LAS GRILLAS PARA EL ESCENARIO
+           /* var axesHelper = new THREE.AxesHelper(size);
+            scene.add(axesHelper);
+
+            var gridHelperXZ = new THREE.GridHelper(size, divisions, color, color);
+            scene.add(gridHelperXZ);
+
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis(y, THREE.Math.degToRad(90)); 
+*/
+ //MATERIAL DE LAS PAREDES
+
+      //Textura
+            
+            var textureLoader = new THREE.TextureLoader();
+            Pared = textureLoader.load("WhiteFloor.jpg");
+            
+            var matPared = new THREE.MeshPhongMaterial( {color: 0xccd1ce,map: Pared, side: THREE.DoubleSide} );
+  
+            //Pared 1
+            var geometry = new THREE.PlaneGeometry( 70, 30, 30 );
+            var plane = new THREE.Mesh( geometry, matPared );
+            scene.add( plane );
+            
+         plane.rotation.y=0;
+              plane.rotation.x=0;
+              plane.rotation.z=0;
+            
+            
+              plane.position.x=0;
+                plane.position.y=14.5;
+                plane.position.z=-34.8;
+
+            
+            
+            //Pared 2
+             var geometry = new THREE.PlaneGeometry( 70, 30, 30 );
+            var plane2 = new THREE.Mesh( geometry, matPared);
+            scene.add( plane2 );
+            
+         plane2.rotation.y=0;
+              plane2.rotation.x=0;
+              plane2.rotation.z=0;
+            
+            
+              plane2.position.x=0;
+                plane2.position.y=15.4;
+                plane2.position.z=35;
+            
+            //Pared 3
+             var geometry = new THREE.PlaneGeometry( 70, 30, 30 );
+            var plane3 = new THREE.Mesh( geometry, matPared );
+            scene.add( plane3 );
+            
+           plane3.rotation.y=-1.571;
+              plane3.rotation.x=0;
+              plane3.rotation.z=0;
+            
+            
+              plane3.position.x=-35;
+                plane3.position.y=15;
+                plane3.position.z=0;
+            
+               //SUELO
+             var geometry = new THREE.PlaneGeometry( 70, 70, 70 );
+            var material = new THREE.MeshBasicMaterial( {color: 0x4682B4, side: THREE.DoubleSide} );
+            var plane4 = new THREE.Mesh( geometry, matPared );
+            scene.add( plane4 );
+            
+            plane4.rotation.y=0;
+            plane4.rotation.x=4.70;
+            plane4.rotation.z=0;
+            
+            
+         plane4.position.x=0;
+         plane4.position.y=0;
+         plane4.position.z=0;
+
+            
+            //Pared 4
+            
+         var geometry = new THREE.BoxGeometry( 20, 30.4, 20 );
+           var plane5 = new THREE.Mesh( geometry, matPared );
+          scene.add( plane5 );
+            
+        plane5.position.x=-24.5;
+         plane5.position.y=15.2;
+         plane5.position.z=-24.5; 
+
+            
+            //TUBOS 
+            
+var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo1 = new THREE.Mesh( geometry, material );
+scene.add( Tubo1 );
+            
+            
+                  
+         Tubo1.position.x=-2;
+         Tubo1.position.y=16;
+         Tubo1.position.z=32;
+            
+            
+ var geometry = new THREE.CylinderGeometry( 1.5, 1.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo2 = new THREE.Mesh( geometry, material );
+scene.add( Tubo2 );
+            
+            
+                  
+         Tubo2.position.x=4.5;
+         Tubo2.position.y=16;
+         Tubo2.position.z=33;
+            
+            
+ var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 15, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo3 = new THREE.Mesh( geometry, material );
+scene.add( Tubo3 );
+            
+            
+                  
+         Tubo3.position.x=11.8;
+         Tubo3.position.y=8;
+         Tubo3.position.z=34.5;
+            
+var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo4 = new THREE.Mesh( geometry, material );
+scene.add( Tubo4 );
+            
+                  
+         Tubo4.position.x=20;
+         Tubo4.position.y=15;
+         Tubo4.position.z=34.5;
+             
+             Tubo4.rotation.y=0;
+            Tubo4.rotation.x=0;
+            Tubo4.rotation.z=-1.58; 
+            
+            
+ var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo5 = new THREE.Mesh( geometry, material );
+scene.add( Tubo5 );
+            
+            
+                  
+         Tubo5.position.x=-32.5;
+         Tubo5.position.y=15.6;
+         Tubo5.position.z=32.5;
+            
+            
+var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo6 = new THREE.Mesh( geometry, material );
+scene.add( Tubo6 );
+            
+            
+                  
+         Tubo6.position.x=-32.5;
+         Tubo6.position.y=15.6;
+         Tubo6.position.z=27;
+            
+            
+ var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo7 = new THREE.Mesh( geometry, material );
+scene.add( Tubo7 );
+            
+            
+                  
+         Tubo7.position.x=-32.5;
+         Tubo7.position.y=15.6;
+         Tubo7.position.z=-12;
+            
+            
+var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 20, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo8 = new THREE.Mesh( geometry, material );
+scene.add( Tubo8 );
+            
+            
+                  
+         Tubo8.position.x=-34.5;
+         Tubo8.position.y=15.6;
+         Tubo8.position.z=17;
+            
+ var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo81 = new THREE.Mesh( geometry, material );
+scene.add( Tubo81 );
+            
+            
+                  
+         Tubo81.position.x=-34.5;
+         Tubo81.position.y=25;
+         Tubo81.position.z=2;
+            
+            Tubo81.rotation.y=0;
+            Tubo81.rotation.x=4.70;
+            Tubo81.rotation.z=0;
+            
+            
+             
+        
+var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 10, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo82 = new THREE.Mesh( geometry, material );
+scene.add( Tubo82 );
+            
+            
+                  
+         Tubo82.position.x=-34.5;
+         Tubo82.position.y=5.5;
+         Tubo82.position.z=21.7;
+            
+            Tubo82.rotation.y=0;
+            Tubo82.rotation.x=4.70;
+            Tubo82.rotation.z=0;
+ 
+ 
+            
+            
+var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 20, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo83 = new THREE.Mesh( geometry, material );
+scene.add( Tubo83 );
+            
+            
+                  
+         Tubo83.position.x=-34.5;
+         Tubo83.position.y=15.6;
+         Tubo83.position.z=3;
+            
+            
+var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 20, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo84 = new THREE.Mesh( geometry, material );
+scene.add( Tubo84 );
+            
+            
+                  
+         Tubo84.position.x=-34.5;
+         Tubo84.position.y=15.6;
+         Tubo84.position.z=10;
+            
+            
+var geometry = new THREE.CylinderGeometry( 3, 3, 7, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xB22222} );
+var Tubo11 = new THREE.Mesh( geometry, material );
+scene.add( Tubo11 );
+            
+             
+            Tubo11.rotation.y=0;
+            Tubo11.rotation.x=4.70;
+            Tubo11.rotation.z=0;
+ 
+         Tubo11.position.x=-2;
+         Tubo11.position.y=15;
+         Tubo11.position.z=31;
+            
+            //MANIVELA
+            
+    var geometry = new THREE.TorusGeometry( 10, 0.9, 16, 100 );
+var material = new THREE.MeshPhongMaterial( { color: 0x000000 } );
+var torus = new THREE.Mesh( geometry, material );
+scene.add( torus );
+    torus.applyMatrix( new THREE.Matrix4().makeScale(.4,.4,.4) );
+            
+        torus.position.x=-2;
+         torus.position.y=15;
+         torus.position.z=28;
+            
+            
+            
+            //WATER
+            
+var geometry = new THREE.BoxGeometry( 9, 7, 5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var water = new THREE.Mesh( geometry, material );
+scene.add( water );
+            
+         water.position.x=-15;
+         water.position.y=12;
+         water.position.z=32.3;
+            
+            
+ var geometry = new THREE.CylinderGeometry( 5, 5, 3, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var Taza1 = new THREE.Mesh( geometry, material );
+scene.add( Taza1 );
+            
+            
+                  
+        Taza1.position.x=-15;
+         Taza1.position.y=9;
+         Taza1.position.z=28;
+            
+
+            
+ var geometry = new THREE.ConeGeometry( 4.5, 8, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cone = new THREE.Mesh( geometry, material );
+scene.add( cone );
+            
+            cone.position.x=-15;
+         cone.position.y=4.5;
+         cone.position.z=28;
+            
+            
+            var geometry = new THREE.ConeGeometry( 4.5, 8, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cone1 = new THREE.Mesh( geometry, material );
+scene.add( cone1 );
+            
+            cone1.position.x=-15;
+         cone1.position.y=4.5;
+         cone1.position.z=28; 
+            
+            cone1.rotation.y=0;
+            cone1.rotation.x=-3.2;
+            cone1.rotation.z=0; 
+            
+            
+            // TINA
+            
+var geometry = new THREE.BoxGeometry( 5, 10, 30 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube1 = new THREE.Mesh( geometry, material );
+scene.add( cube1 );
+            
+            cube1.position.x=-22.2;
+         cube1.position.y=5.5;
+         cube1.position.z=6; 
+            
+            
+            var geometry = new THREE.BoxGeometry( 5, 10, 30 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube2 = new THREE.Mesh( geometry, material );
+scene.add( cube2 );
+            
+         cube2.position.x=-32.2;
+         cube2.position.y=5.5;
+         cube2.position.z=6; 
+            
+ var geometry = new THREE.BoxGeometry( 10, 10, 5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube3 = new THREE.Mesh( geometry, material );
+scene.add( cube3 );
+            
+        cube3.position.x=-29.6;
+         cube3.position.y=5.5;
+         cube3.position.z=18.5; 
+            
+            var geometry = new THREE.BoxGeometry( 10, 10, 5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube4 = new THREE.Mesh( geometry, material );
+scene.add( cube4 );
+            
+        cube4.position.x=-29.6;
+         cube4.position.y=5.5;
+         cube4.position.z=-6.5; 
+            
+            
+            //AGUA DE LA TINA
+            
+             var geometry = new THREE.PlaneGeometry( 20, 7, 8 );
+            var material = new THREE.MeshBasicMaterial( {color: 0x00BFFF, side: THREE.DoubleSide} );
+            var plane5 = new THREE.Mesh( geometry, material );
+            scene.add( plane5 );
+            
+              plane5.rotation.y=0;
+              plane5.rotation.x=-17.3;
+              plane5.rotation.z=1.58;
+            
+            
+              plane5.position.x=-28;
+                plane5.position.y=8;
+                plane5.position.z=6;
+            
+            
+            // LAVAMANOS
+            
+var geometry = new THREE.BoxGeometry(4, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube5 = new THREE.Mesh( geometry, material );
+scene.add( cube5);
+            
+            cube5.position.x=-10;
+         cube5.position.y=11;
+         cube5.position.z=-29.5; 
+            
+            var geometry = new THREE.BoxGeometry( 4, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube6= new THREE.Mesh( geometry, material );
+scene.add( cube6 );
+            
+            cube6.position.x=0;
+         cube6.position.y=11;
+         cube6.position.z=-29.5; 
+            
+            var geometry = new THREE.BoxGeometry( 14.5, 5, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube7 = new THREE.Mesh( geometry, material );
+scene.add( cube7);
+            
+            cube7.position.x=-5;
+         cube7.position.y=8.5;
+         cube7.position.z=-29.5; 
+            
+            var geometry = new THREE.BoxGeometry( 10, 10, 2 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube8 = new THREE.Mesh( geometry, material );
+scene.add( cube8);
+            
+            cube8.position.x=-5;
+         cube8.position.y=11;
+         cube8.position.z=-25.5; 
+            
+            
+            // LAVAMANOS 2 
+            
+           var geometry = new THREE.BoxGeometry(4, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube9 = new THREE.Mesh( geometry, material );
+scene.add( cube9);
+            
+            cube9.position.x=10;
+         cube9.position.y=11;
+         cube9.position.z=-29.5; 
+            
+            var geometry = new THREE.BoxGeometry( 4, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube10= new THREE.Mesh( geometry, material );
+scene.add( cube10 );
+            
+            cube10.position.x=20;
+         cube10.position.y=11;
+         cube10.position.z=-29.5; 
+            
+            var geometry = new THREE.BoxGeometry( 14.5, 5, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube11 = new THREE.Mesh( geometry, material );
+scene.add( cube11);
+            
+            cube11.position.x=15;
+         cube11.position.y=8.5;
+         cube11.position.z=-29.5; 
+            
+var geometry = new THREE.BoxGeometry( 10, 10, 2 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube12 = new THREE.Mesh( geometry, material );
+scene.add( cube12);
+            
+        cube12.position.x=15;
+         cube12.position.y=11;
+         cube12.position.z=-25.5; 
+            
+            //AGUA DEL LAVAMANOS 
+            
+             var geometry = new THREE.PlaneGeometry( 7,7, 7 );
+            var material = new THREE.MeshBasicMaterial( {color: 0x00BFFF, side: THREE.DoubleSide} );
+            var plane6 = new THREE.Mesh( geometry, material );
+            scene.add( plane6 );
+            
+              plane6.rotation.y=0;
+              plane6.rotation.x=-17.3;
+              plane6.rotation.z=1.58;
+            
+            
+              plane6.position.x=-6;
+                plane6.position.y=14;
+                plane6.position.z=-30;
+            
+                
+            //AGUA DEL LAVAMANOS 
+            
+             var geometry = new THREE.PlaneGeometry( 7,7, 7 );
+            var material = new THREE.MeshBasicMaterial( {color: 0x00BFFF, side: THREE.DoubleSide} );
+            var plane7 = new THREE.Mesh( geometry, material );
+            scene.add( plane7 );
+            
+              plane7.rotation.y=0;
+              plane7.rotation.x=-17.3;
+              plane7.rotation.z=1.58;
+            
+            
+              plane7.position.x=15;
+                plane7.position.y=14;
+                plane7.position.z=-30;
+            
+            
+            
+            // MUÑECO DE JOHN KRAMER
+            
+            //CABEZA
+ var geometry = new THREE.BoxGeometry( 6, 3, 6 );
+var material = new THREE.MeshPhongMaterial( {color: 0xFA8072} );
+var cube13 = new THREE.Mesh( geometry, material );
+scene.add( cube13 );
+            
+        cube13.position.x=15;
+         cube13.position.y=2;
+         cube13.position.z=16.6; 
+            
+            //TRONCO
+var geometry = new THREE.BoxGeometry( 9.5, 3, 9.5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var cube14 = new THREE.Mesh( geometry, material );
+scene.add( cube14 );
+            
+        cube14.position.x=15;
+         cube14.position.y=2;
+         cube14.position.z=9;
+            
+         //PANTALONETA 1
+ var geometry = new THREE.BoxGeometry( 9.5, 3, 3 );
+var material = new THREE.MeshPhongMaterial( {color: 0x4682B4} );
+var cube15 = new THREE.Mesh( geometry, material );
+scene.add( cube15 );
+            
+        cube15.position.x=15;
+         cube15.position.y=2;
+         cube15.position.z=2.8; 
+            
+            
+              //PANTALONETA 2
+ var geometry = new THREE.BoxGeometry( 3, 3, 5 );
+var material = new THREE.MeshPhongMaterial( {color: 0x4682B4} );
+var cube16 = new THREE.Mesh( geometry, material );
+scene.add( cube16 );
+            
+        cube16.position.x=11.9;
+         cube16.position.y=2;
+         cube16.position.z=-1.2; 
+            
+            
+              //PANTALONETA 3
+ var geometry = new THREE.BoxGeometry( 3, 3, 5 );
+var material = new THREE.MeshPhongMaterial( {color: 0x4682B4} );
+var cube17 = new THREE.Mesh( geometry, material );
+scene.add( cube17 );
+            
+        cube17.position.x=18.3;
+         cube17.position.y=2;
+         cube17.position.z=-1.2; 
+            
+                          //PIERNA 1
+ var geometry = new THREE.BoxGeometry( 3, 3, 7 );
+var material = new THREE.MeshPhongMaterial( {color: 0xFA8072} );
+var cube18 = new THREE.Mesh( geometry, material );
+scene.add( cube18 );
+            
+        cube18.position.x=11.9;
+         cube18.position.y=2;
+         cube18.position.z=-7.2; 
+            
+                //PIERNA 2
+ var geometry = new THREE.BoxGeometry( 3, 3, 7 );
+var material = new THREE.MeshPhongMaterial( {color: 0xFA8072} );
+var cube19 = new THREE.Mesh( geometry, material );
+scene.add( cube19 );
+            
+        cube19.position.x=18.3;
+         cube19.position.y=2;
+         cube19.position.z=-7.2; 
+            
+                 //BRAZO 1
+ var geometry = new THREE.BoxGeometry( 3, 3, 9.5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xFA8072} );
+var cube20 = new THREE.Mesh( geometry, material );
+scene.add( cube20 );
+            
+        cube20.position.x=22;
+         cube20.position.y=2;
+         cube20.position.z=13; 
+            
+           cube20.rotation.y=-2.5;
+              cube20.rotation.x=0;
+              cube20.rotation.z=0;
+            
+             //BRAZO 2
+ var geometry = new THREE.BoxGeometry( 3, 3, 9.5 );
+var material = new THREE.MeshPhongMaterial( {color: 0xFA8072} );
+var cube21 = new THREE.Mesh( geometry, material );
+scene.add( cube21 );
+            
+        cube21.position.x=8;
+         cube21.position.y=2;
+         cube21.position.z=13; 
+            
+            cube21.rotation.y=2.5;
+              cube21.rotation.x=0;
+              cube21.rotation.z=0;
+            
+            
+            
+            //SANGRE
+            
+    var geometry = new THREE.PlaneGeometry( 27, 20, 20 );
+var material = new THREE.MeshPhongMaterial( {color: 0x8B0000, side: THREE.DoubleSide} );
+var Blood= new THREE.Mesh( geometry, material );
+scene.add( Blood );
+            
+            Blood.position.x=18;
+         Blood.position.y=0.7;
+         Blood.position.z=12;
+            
+              Blood.rotation.y=0;
+            Blood.rotation.x=4.70;
+            Blood.rotation.z=0;
+            
+        /// CREAR ILUMINACIÓN
+//ambientLight = new THREE.AmbientLight(0x5f8dbc, 0.5);
+	//scene.add(ambientLight);
+    
+    var pointLight = new THREE.PointLight(0x0568ef, 1, 100);
+    pointLight.position.set(9, 50, 0);  
+    scene.add(pointLight);
+            
+// var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+// scene.add( light );
+            
+      //var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+      //scene.add( directionalLight );
+            //LUZ DE LA PRIMERA BOMBILLA
+            var spotLight = new THREE.SpotLight( 0x5f8dbc, 1 );
+          spotLight.position.set( 3, 40, -27 );
+            scene.add( spotLight );
+          
+            
+              //LUZ DE LA SEGUNDA BOMBILLA
+            var spotLight = new THREE.SpotLight( 0x5f8dbc, 1 );
+          spotLight.position.set( -28, 40, 5 );
+            scene.add( spotLight );
+        
+            
+            
+              //LUZ DE LA TERCERA BOMBILLA
+            var spotLight = new THREE.SpotLight( 0x5f8dbc, 1 );
+          spotLight.position.set( -5, 40, 24 );
+            scene.add( spotLight );
+            
+            // BOMBILLOS LARGOS
+            
+  var geometry = new THREE.BoxBufferGeometry( 4, 2, 25 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var Lamp1 = new THREE.Mesh( geometry, material );
+scene.add( Lamp1 );
+          
+           Lamp1.position.x = 3;
+            Lamp1.position.y = 40;
+           Lamp1.position.z = -27;
+            
+                Lamp1.rotation.y=1.58;
+               Lamp1.rotation.x=0;
+              Lamp1.rotation.z=3.15;
+            
+            
+            // SOSTENEDOR 1
+            
+     var geometry = new THREE.CylinderBufferGeometry( 1.5, 1.5, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0x000000} );
+var SOS1 = new THREE.Mesh( geometry, material );
+scene.add( SOS1 );
+            
+               
+          SOS1.position.x = 3;
+            SOS1 .position.y = 45;
+           SOS1 .position.z = -27;
+            
+var geometry = new THREE.BoxBufferGeometry( 4, 2, 25 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var Lamp2 = new THREE.Mesh( geometry, material );
+scene.add( Lamp2 );
+          
+           Lamp2.position.x = -28;
+            Lamp2.position.y = 40;
+           Lamp2.position.z = 5;
+            
+                Lamp1.rotation.y=1.58;
+               Lamp1.rotation.x=0;
+              Lamp1.rotation.z=3.15;
+            
+            
+            // SOSTENEDOR 2
+            
+     var geometry = new THREE.CylinderBufferGeometry( 1.5, 1.5, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0x000000} );
+var SOS2 = new THREE.Mesh( geometry, material );
+scene.add( SOS2);
+            
+               
+          SOS2.position.x = -28;
+            SOS2 .position.y = 45;
+           SOS2 .position.z = 5;
+            
+var geometry = new THREE.BoxBufferGeometry( 4, 2, 25 );
+var material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+var Lamp3= new THREE.Mesh( geometry, material );
+scene.add( Lamp3 );
+          
+           Lamp3.position.x = -5;
+            Lamp3.position.y = 40;
+           Lamp3.position.z = 24;
+            
+                Lamp3.rotation.y=1.58;
+               Lamp3.rotation.x=0;
+              Lamp3.rotation.z=3.15;
+	
+            
+              // SOSTENEDOR 3
+            
+     var geometry = new THREE.CylinderBufferGeometry( 1.5, 1.5, 10, 10 );
+var material = new THREE.MeshPhongMaterial( {color: 0x000000} );
+var SOS3 = new THREE.Mesh( geometry, material );
+scene.add( SOS3);
+            
+               
+          SOS3.position.x = -5;
+           SOS3.position.y = 45;
+           SOS3.position.z = 24;
+            
+	light = new THREE.PointLight(0xffffff, 0.8, 18);
+	light.position.set(-3,10,-3);
+	light.castShadow = true;
+	// Will not light anything closer than 0.1 units or further than 25 units
+	light.shadow.camera.near = 0.1;
+	light.shadow.camera.far = 25;
+	scene.add(light); 
+	
+            camera.position.x = 70;
+            camera.position.y = 50;
+            camera.position.z = 0;
+            camera.lookAt(origin);
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            render();
+        }
+        function render() {
+            renderer.render(scene, camera);
+            var dtime = Date.now()-startTime;
+		
+        }
+    </script>
+</body>
+
+</html>
