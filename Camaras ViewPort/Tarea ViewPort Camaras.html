@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Transformaciones</title>
+        <style>
+            html, body { margin: 0; padding: 0; overflow: hidden; }
+            #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #FFFFFF;
+            }
+        </style>
+    </head>
+    <body>
+    <script src="js/three.min.js"></script>
+    <script>
+		var scene, aspect, camera,camera2,camera3,camera4, renderer, helper;
+		var geometry;
+		var object;
+		var startTime = Date.now();
+				
+		var upArrow = false;
+		var downArrow = false;
+		var leftArrow = false;
+		var rightArrow = false;
+		var scaleUp = false;
+		var scaleDown = false;
+		var xAxis = true;
+		var yAxis = false;
+		var zAxis = false;
+		var adelante = false;
+		var atras = false ;
+		var izq = false;
+		var der = false;
+		
+		var mapWidth = window.innerWidth/3, mapHeight = window.innerHeight/2; 
+		var w,h;
+		w = window.innerWidth;
+		h= window.innerHeight;
+		
+		init();
+		animate();
+	
+		function init(){
+			scene = new THREE.Scene();
+			aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			camera2 = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			camera3 = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			camera4 = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			helper2 = new THREE.CameraHelper(camera2);
+			helper3 = new THREE.CameraHelper(camera3);
+			helper4 = new THREE.CameraHelper(camera4);
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+				  			
+			//EVENTOS DE TECLADO
+			
+			var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: // TRASLADAR ADELANTE
+						upArrow = true;
+						break;
+					case 40: // TRASLADAR ATRÁS
+						downArrow = true;
+						break;
+					case 37: // ROTAR CW
+						leftArrow = true;
+						break;
+					case 39: // ROTAR CCW
+						rightArrow = true;
+						break;
+					case 88: // SELECCIONAR EJE X DE ROTACION
+						yAxis = false;
+						zAxis = false;
+						xAxis = true;
+						break;
+					case 89: // SELECCIONAR EJE Y DE ROTACION
+						xAxis = false;
+						zAxis = false;
+						yAxis = true;
+						break;
+					case 90: // SELECCIONAR EJE Z DE 
+						xAxis = false;
+						yAxis = false;
+						zAxis = true;
+						break;
+					case 87:
+						adelante = true;
+						break;
+					case 83:
+						atras = true;
+						break;
+						
+					case 65:
+						izq = true;
+						break;
+					case 68:
+						der = true;
+						break;
+				}
+			};	  
+		  			
+			var onKeyUp = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: // TRASLADAR
+						upArrow = false;
+						break;
+					case 40: // TRASLADAR
+						downArrow = false;
+						break;
+					case 37: // ROTAR CW
+						leftArrow = false;
+						break;
+					case 39: // ROTAR CCW
+						rightArrow = false;
+						break;
+						
+					case 87:
+						adelante = false;
+						break;
+					case 83:
+						atras = false;
+						break;
+						
+					case 65:
+						izq = false;
+						break;
+					case 68:
+						der = false;
+						break;
+				}
+			};	  	
+			
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
+			
+			//ELEMENTOS DE ESCENA
+							  
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+			var color1 = new THREE.Color( 0xFFFFFF );
+		  	var color2 = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA0000 );
+		  	var colorG = new THREE.Color( 0x00AA00 );
+		  	var colorB = new THREE.Color( 0x0000AA );
+			var colorRd = new THREE.Color( 0xAA6666 );
+		  	var colorGd = new THREE.Color( 0x66AA66 );
+		  	var colorBd = new THREE.Color( 0x6666AA );
+		  
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+		  	var gridHelperXY = new THREE.GridHelper( size, divisions, color2, color2);
+			var gridHelperXY2 = new THREE.GridHelper( size, divisions, color2, color2);
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2 );
+			var gridHelperXZ2 = new THREE.GridHelper( size, divisions, color2, color2 );
+		  	var gridHelperYZ = new THREE.GridHelper( size, divisions, color2, color2 );
+			var gridHelperYZ2 = new THREE.GridHelper( size, divisions, color2, color2 );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+            gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
+			gridHelperXY2.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+            gridHelperXZ2.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+            gridHelperYZ2.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
+			gridHelperXY.translateOnAxis ( y , 5);
+			gridHelperXY2.translateOnAxis ( y , -5);
+			gridHelperXZ.translateOnAxis ( y , 5);
+			gridHelperXZ2.translateOnAxis ( y , -5);
+			gridHelperYZ.translateOnAxis ( y , 5);
+			gridHelperYZ2.translateOnAxis ( y , -5);
+            
+            //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
+            var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
+            var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
+            var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
+			
+			//CREAR LAS GEOMETRÍAS
+			geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				switch(i){
+					case 0: case 1: geometry.faces[ i ].color = colorRd; break;
+					case 2: case 3: geometry.faces[ i ].color = colorRd; break;
+					case 4: case 5: geometry.faces[ i ].color = colorGd; break;
+					case 6: case 7: geometry.faces[ i ].color = colorGd; break;
+					case 8: case 9: geometry.faces[ i ].color = colorBd; break;
+					case 10: case 11: geometry.faces[ i ].color = colorBd; break;
+				}				
+			}
+			
+			//CREAR LOS MATERIALES
+			var material = new THREE.MeshBasicMaterial( { color: color1, vertexColors: THREE.FaceColors } );
+			
+			//CREAR LOS OBJETOS
+			object = new THREE.Mesh( geometry, material );
+									
+		  	//AGREGAR A LA ESCENA
+            scene.add( gridHelperXZ );
+			scene.add( gridHelperXY );
+			scene.add( gridHelperYZ );
+			scene.add( gridHelperXZ2 );
+			scene.add( gridHelperXY2 );
+			scene.add( gridHelperYZ2 );
+		  	scene.add( arrowX );	
+		  	scene.add( arrowY );	
+		  	scene.add( arrowZ );	
+			scene.add( object );
+			scene.add(camera2);
+			scene.add(camera3);
+			scene.add(camera4);
+			
+			//MOVER LA CAMARA
+			camera2.copy(camera);
+			helper2.update();
+			camera3.copy(camera);
+			helper3.update();
+			camera4.copy(camera);
+			helper4.update();
+			
+			camera.position.x = -4;
+			camera.position.y = 2;	 
+		  	camera.position.z = 0;		
+		  	camera.lookAt( origin );
+			
+			camera2.position.x = -10;
+			camera2.position.y = 0;	 
+		  	camera2.position.z = 0;			
+		  	camera2.lookAt( 0,0,0 );
+			
+			camera3.position.x = 0;
+			camera3.position.y = 10;	 
+		  	camera3.position.z = 0;			
+		  	camera3.lookAt( origin );
+			
+			camera4.position.x = 0;
+			camera4.position.y = 0;	 
+		  	camera4.position.z = -10;			
+		  	camera4.lookAt( 0,0,0 );
+			
+			renderer.render( scene, camera );
+			}
+    
+    function animate() {
+        render();
+        requestAnimationFrame( animate );
+    }
+    
+    function render(){
+        var dtime = Date.now()-startTime;
+		var tx=0, ty=0, tz=0;	//Variables para traslacion
+		var theta=0;			//Variable para ángulo de rotación
+		
+		if(upArrow) {
+			tx=0; ty=0.1; tz=0;
+		}
+		if(downArrow) {
+			tx=0; ty=-0.1; tz=0;
+		}
+		if(rightArrow){
+			theta = .1;
+		}
+		if(leftArrow){
+			theta = -.1;
+		}
+		if(adelante) {
+			tx=0.1; ty=0; tz=0;
+		}
+		if(atras) {
+			tx=-0.1; ty=0; tz=0;
+		}
+		if(izq) {
+			tx=0; ty=0; tz=-0.1;
+		}
+			
+		if(der) {
+			tx=0; ty=0; tz=0.1;
+		}
+		
+		
+		//MATRIZ DE TRASLACIÓN
+		var t = new THREE.Matrix4();
+		t.set( 	1, 0, 0, tx,
+				0, 1, 0, ty, 
+				0, 0, 1, tz,
+				0, 0, 0, 1	);
+
+		object.applyMatrix(t);
+		camera.applyMatrix(t);
+		
+		//ROTACIONES
+		var temp = new THREE.Matrix4();
+		
+		
+		var ct = Math.cos(theta);
+		var st = Math.sin(theta);
+		var r = new THREE.Matrix4();
+
+		//MATRIZ DE ROTACIÓN EN EJE X
+		if(xAxis){
+			r.set( 	1,  0,  0, 0,
+					0, ct,-st, 0, 
+					0, st, ct, 0,
+					0,  0,  0, 1 );		
+		}
+		//MATRIZ DE ROTACIÓN EN EJE Y
+		else if(yAxis){
+			r.set( 	ct, 0, st, 0,
+					 0, 1,  0, 0, 
+				   -st, 0, ct, 0,
+					 0, 0,  0, 1 );		
+		}
+		//MATRIZ DE ROTACIÓN EN EJE Z
+		else if (zAxis){
+			r.set( 	ct,-st, 0, 0,
+				    st, ct, 0, 0, 
+					 0,  0, 1, 0,
+					 0,  0, 0, 1 );		
+		}
+				
+		temp.copyPosition( object.matrix );		
+		object.applyMatrix( new THREE.Matrix4().getInverse(temp));
+		camera.applyMatrix( new THREE.Matrix4().getInverse(temp));
+		object.applyMatrix(r);
+		camera.applyMatrix(r);
+		object.applyMatrix(temp);
+		camera.applyMatrix(temp);
+				
+		object.elementsNeedUpdate = true;
+		//objeto2.elementsNeedUpdate = true;.
+		
+		renderer.setViewport( 0, h/2, w, h/2 );
+        renderer.setScissor( 0, h/2, w, h/2 );
+        renderer.render( scene, camera );
+		
+        renderer.setViewport( 0,  0, mapWidth, mapHeight );
+        renderer.setScissor( 0,  0, mapWidth, mapHeight );
+        renderer.setScissorTest( true );
+        renderer.render( scene, camera2 );
+		
+		renderer.setViewport( w/3,  0, mapWidth, mapHeight );
+        renderer.setScissor( w/3,  0, mapWidth, mapHeight );
+        renderer.setScissorTest( true );
+        renderer.render( scene, camera3 );
+		
+		renderer.setViewport( 2*(w/3),  0, mapWidth, mapHeight );
+        renderer.setScissor( 2*(w/3),  0, mapWidth, mapHeight );
+        renderer.setScissorTest( true );
+        renderer.render( scene, camera4 );
+    }
+    </script>
+  </body>
+</html>
